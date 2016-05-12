@@ -1,0 +1,8 @@
+whatdo.cpp,,70,120,0,1,0,programming,1
+programming challenges,,10,60,0,1,0,programming,1
+firefox development,,180,60,0,1,0,programming,1
+web development,,10,60,0,1,0,programming,1
+walking,,60,30,1,0,0,cardio,1
+yoga,,60,30,1,0,0,cardio,0
+calisthenics,,60,30,1,0,0,cardio,0
+applying to FT IT jobs,,80,60,0,1,0,jobs,1
