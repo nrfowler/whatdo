@@ -10,9 +10,10 @@ class Task{
         bool sleepfriendly; //1 means activity will not disrupt sleep if done 1-2 hours before sleep (reading, eating, etc)
         string domain; //The specific domain or ability that the utils is applied to, for instance career, meditation, walking.
         bool indefinite; //has no end time; the min is the minimum minutes to spend
-        void decrementMin(int completed){
-            min-=completed;
-        }
+        bool done; //This task is done for the day
+        // void decrementMin(int completed){
+            // min-=completed;
+        // }
     };
      class less_than_key
     {
