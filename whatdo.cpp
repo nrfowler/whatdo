@@ -17,7 +17,8 @@ void addTask(){};
 void rmTask(){};
 void saveSchedule(){};
 void printSched(vector<Task> vec, duration length);
-void rmEmptyLines(){};
+void rmEmptyLines();
+void printAllTasks(vector<Task> todo, duration length);
 duration mins2duration(int mins){ //does cpp have tio
     duration temp(mins/60,mins%60);
     return temp;
@@ -26,6 +27,7 @@ int main() {
     int hours, minutes, foo;
     duration length(0,0);
             vector<Task> todo;
+            vector<Task> tasks = readTasks();
 while (foo!=4){
     cout << endl << "What would you like to do?" << endl << "1: Make a schedule" << endl << "2: Mark Tasks as Done" << endl << "3: Add Tasks" << endl << "4. Quit" << endl;
     cin >> foo;
@@ -37,8 +39,8 @@ while (foo!=4){
         length.hours=hours;
         length.minutes=minutes;
         todo.clear();
-        int min=hours*60+minutes;g
-        vector<Task> tasks = readTasks();
+        int min=hours*60+minutes;
+        tasks = readTasks();
         tasks=sortTasks(tasks);
         vector<Task>::iterator it = tasks.begin();
         while (min>=0 && it!=tasks.end()){
@@ -53,20 +55,19 @@ while (foo!=4){
     }
     else if(foo==2){
         int remove,perm;
-        cout << "Here is your schedule: " << endl;
-            printSched(todo,length);
-            cout<< "What would you like to mark as done?" <<endl;
-            cin >> remove;
-            cout <<"Do you want to remove it permanently (0), or just mark it done for the day? (1)"<<endl;
-            cin >> perm;
-            //remove task from todo and recompile schedule
-            if(perm){
-                //find line of file
-                //delete line
-            }
-            else {
-                //mark task as done in file
-            }
+        printAllTasks(tasks,length);
+        cout<< "What would you like to mark as done?" <<endl;
+        cin >> remove;
+        cout <<"Do you want to remove it permanently (0), or just mark it done for the day? (1)"<<endl;
+        cin >> perm;
+        //remove task from todo and recompile schedule
+        if(perm){
+            //find line of file
+            //delete line
+        }
+        else {
+            //mark task as done in file
+        }
             
         }
     else if(foo==3){
@@ -89,10 +90,21 @@ while (foo!=4){
 }
 
 void printSched(vector<Task> todo, duration length){
-    cout << "How to fill " << length.hours << " hours and " << length.minutes << " minutes: " << endl;
-        for (unsigned int i =0;i<todo.size();i++){
-            cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes"<< endl;
+    cout <<endl<< "How to fill " << length.hours << " hours and " << length.minutes << " minutes: " << endl;
+    if(todo[0].indefinite){ //most important task is of undefined maximum duration
+        cout << todo[0].what <<" - "<<todo[0].desc<< endl;
+        return;
         }
+        for (unsigned int i =0;i<todo.size();i++){
+            cout <<(i+1)<<". "<< todo[i].what <<" - "<<todo[i].desc<< " -  for " << todo[i].min <<" minutes"<< endl;
+        }
+}
+
+void printAllTasks(vector<Task> todo, duration length){
+    cout <<endl<< "Your tasks: " << endl;
+    for (unsigned int i =0;i<todo.size();i++){
+        cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes"<< endl;
+    }
 }
 
 vector<Task> sortTasks(vector<Task> vec){
