@@ -8,19 +8,18 @@
 #include <algorithm>
 #include "whatdo.h"
 using namespace std;
-//TODO: 
-//[X] don't print "-" when no description - boolean null string
+//Progress: 
 //[ ] search by task name
     //[ ] search function for Task vector
-//[x] mark task done 
-//[ ] delete task
-    //[ ] delete a vector element
+//[test] mark task done
+//[test] delete task
+    //[x] delete a vector element
 //[test] edit task function
-    //[ ] Programmatic selection of class member variable
-//[test] save tasks vector to file
+    //[X] Programmatic selection of class member variable (switch statement)
+//[test] save tasks vector to file FAILED
 //[test] add task to task vector
-//[ ] update tasks every day
-    //[ ] see if chron or native function can return current date
+//[ ] update tasks every day using ctime, see http://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
+    //[x] see if chron or native function can return current date 
 
 const int ROWS = 100;
 const int COLS = 9;
@@ -29,8 +28,8 @@ vector<Task> readTasks();
 vector<Task> sortTasks(vector<Task> vec); 
 void addTask(){}; 
 void rmTask(){};
-void saveSchedule(){};
-void appendTask();
+void saveTasks(vector<Task> t);
+void appendTask(Task& task,ofstream outfile);
 void printSched(vector<Task> vec, duration length);
 void rmEmptyLines();
 void printAllTasks(vector<Task> todo);
@@ -39,14 +38,15 @@ duration mins2duration(int mins){ //does cpp have tio
     return temp;
     };
 int main() {
-    int hours, minutes, foo;
+    int hours, minutes;
+    string foo;
     duration length(0,0);
             vector<Task> todo;
             vector<Task> tasks = readTasks();
-while (foo!=4){
-    cout << endl << "What would you like to do?" << endl << "1: Make a schedule" << endl << "2: Mark Tasks as Done" << endl << "3: Add Tasks" << endl << "4: Edit Tasks"<<endl << "5: Delete Tasks" << endl << "6. Quit" << endl;
+while (foo!="4"){
+    cout << endl << "What would you like to do?" << endl << "1: Make a schedule" << endl << "2: Mark Tasks as Done" << endl << "3: Add Tasks" << endl << "4: Edit Tasks"<<endl << "5: Delete Tasks" << endl << "q. Quit" << endl;
     cin >> foo;
-    if(foo==1){
+    if(foo=="1"){
         cout << "How many hours do you have?"<< endl;
         cin >>hours;
         cout << "How many minutes do you have?"<< endl;
@@ -68,25 +68,23 @@ while (foo!=4){
         }
         printSched(todo,length);
     }
-    else if(foo==2){
+    else if(foo=="2"){
         int remove,perm;
         printAllTasks(tasks);
         cout<< "What would you like to mark as done?" <<endl;
         cin >> remove;
         cout <<"Do you want to remove it permanently (0), or just mark it done for the day? (1)"<<endl;
         cin >> perm;
-        //remove task from tasks
         printAllTasks(tasks);
         if(perm){
-            //find line of file
-            //delete line
+            tasks.erase(tasks.begin()+remove-1);
         }
         else {
-            //mark task as done in file
+            tasks[remove-1].done=1;
         }
             
         }
-    else if(foo==3){
+    else if(foo=="3"){
         Task tt;
         cout << "Enter the name of task: " << endl;
         cin >> tt.what;
@@ -115,7 +113,7 @@ while (foo!=4){
         }
         
         
-    else if(foo==4){
+    else if(foo=="4"){
         Task tt;
         int num,field;
         string newval;
@@ -127,22 +125,36 @@ while (foo!=4){
         cin>>field;
         cout<<"Enter the new value"<<endl;
         cin>>newval;
-        //tasks[num-1].field??=newval;
+        switch (field){
+        case 1:
+            tasks[num-1].what=newval;
+            break;
+        case 2:
+            tasks[num-1].desc=newval;
+            break;
+        default:
+            break;
+        }
     }
-    else if(foo==4){
+    else if(foo=="5"){
         Task tt;
         int num,field;
         string newval;
         printAllTasks(tasks);
         cout<< "Which task would you like to delete?" <<endl;
         cin >> num;
-        //delete tasks[num-1];
+        tasks.erase(tasks.begin()+num-1);
+    }
+    else if(foo=="q"){
+    cout << "Goodbye";
+    saveTasks(tasks);
+    return 0;
     }
 }
 }
 
 void printSched(vector<Task> todo, duration length){
-    cout <<endl<< "How to fill " << length.hours << " hours and " << length.minutes << " minutes: " << endl;
+    cout <<endl<< "How to fill " << length.hours << " hours and " << length.minutes << " minutes: \n \n";
     if(todo[0].indefinite){ //most important task is of undefined maximum duration
         if(todo[0].desc!=""){
         cout << todo[0].what <<" - "<<todo[0].desc<< endl;
@@ -175,23 +187,22 @@ vector<Task> sortTasks(vector<Task> vec){
     sort(vec.begin(), vec.end(), less_than_key());
     return vec;
 }
-void appendTask(Task task){
-    ofstream outfile("input.txt");
-  stringstream ss;
-  ss <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<endl;
+void appendTask(Task& task,ofstream outfile){
+  outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<endl;
   outfile.close();
   return;
 }
 void saveTasks(vector<Task> tasks){
     vector<Task>::iterator it = tasks.begin();
+    ofstream outfile("input.txt");
     while (it!=tasks.end()){
             
-                appendTask(*it);
-                //cout << it->min << endl;
+                appendTask(*it,outfile);
+                cout << it->what << endl;
             
             it++;
         }
-
+    outfile.close();
 }
 
 vector<Task> readTasks(){
