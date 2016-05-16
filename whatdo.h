@@ -1,4 +1,5 @@
 #include <vector>
+using namespace std;
 class Task{
     public:
         string what; //present-tense description of action
@@ -11,6 +12,7 @@ class Task{
         string domain; //The specific domain or ability that the utils is applied to, for instance career, meditation, walking.
         bool indefinite; //has no end time; the min is the minimum minutes to spend
         bool done; //This task is done for the day
+        int repeat; //0=no; 1=daily; 2=ev 2 days, etc.
         // void decrementMin(int completed){
             // min-=completed;
         // }
