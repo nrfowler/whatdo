@@ -6,30 +6,33 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <ctime>
 #include "whatdo.h"
 using namespace std;
-//Progress: 
+//Summary: tested save to file
+//Details:
+//removed unused variable field
+//ofstream param is now reference in appendTasks
+//Removed faulty permanent done check
+//Added done import in readTask
 //[ ] search by task name
     //[ ] search function for Task vector
-//[test] mark task done
-//[test] delete task
-    //[x] delete a vector element
-//[test] edit task function
-    //[X] Programmatic selection of class member variable (switch statement)
-//[test] save tasks vector to file FAILED
-//[test] add task to task vector
+//[testing] save tasks vector to file
+// [x] save file after displaying schedule - WORKS
+// [x] save file after adding task - WORKS
+// [x] save file after deleting task - WORKS
+// [x] save file after marking task as done - WORKS
+// [ ] save file after editing task
+//[ ] Figure out why import task done field does not work
 //[ ] update tasks every day using ctime, see http://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
-    //[x] see if chron or native function can return current date 
 
 const int ROWS = 100;
 const int COLS = 9;
 const int BUFFSIZE = 500;
 vector<Task> readTasks();
 vector<Task> sortTasks(vector<Task> vec); 
-void addTask(){}; 
-void rmTask(){};
 void saveTasks(vector<Task> t);
-void appendTask(Task& task,ofstream outfile);
+void appendTask(Task& task,ofstream& outfile);
 void printSched(vector<Task> vec, duration length);
 void rmEmptyLines();
 void printAllTasks(vector<Task> todo);
@@ -73,9 +76,8 @@ while (foo!="4"){
         printAllTasks(tasks);
         cout<< "What would you like to mark as done?" <<endl;
         cin >> remove;
-        cout <<"Do you want to remove it permanently (0), or just mark it done for the day? (1)"<<endl;
-        cin >> perm;
-        printAllTasks(tasks);
+        cout <<"This task has been marked done"<<endl;
+        perm=0; //implement repeat task test here
         if(perm){
             tasks.erase(tasks.begin()+remove-1);
         }
@@ -138,7 +140,7 @@ while (foo!="4"){
     }
     else if(foo=="5"){
         Task tt;
-        int num,field;
+        int num;
         string newval;
         printAllTasks(tasks);
         cout<< "Which task would you like to delete?" <<endl;
@@ -187,9 +189,10 @@ vector<Task> sortTasks(vector<Task> vec){
     sort(vec.begin(), vec.end(), less_than_key());
     return vec;
 }
-void appendTask(Task& task,ofstream outfile){
+void appendTask(Task& task,ofstream& outfile){
+                cout << task.what << endl;
+
   outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<endl;
-  outfile.close();
   return;
 }
 void saveTasks(vector<Task> tasks){
@@ -198,7 +201,7 @@ void saveTasks(vector<Task> tasks){
     while (it!=tasks.end()){
             
                 appendTask(*it,outfile);
-                cout << it->what << endl;
+                //cout << it->what << endl;
             
             it++;
         }
@@ -246,7 +249,8 @@ vector<Task> readTasks(){
       {temptask.domain=buff;}
       else if(col==8) 
       {temptask.indefinite=atoi(buff);}
-      
+      else if(col==9) 
+      {temptask.done=atoi(buff);}
 	  ++col;
 	}
     tasks.push_back(temptask);
