@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cstring>
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -9,26 +10,21 @@
 #include <ctime>
 #include "whatdo.h"
 using namespace std;
-//Summary: tested save to file
+//Summary: mark as done, edit task completed. added "effort" field. Main command prompt now letter based.
 //Details:
-//removed unused variable field
-//ofstream param is now reference in appendTasks
-//Removed faulty permanent done check
-//Added done import in readTask
+//updated COLS const
+//added repeat field to import and save to file
 //[ ] search by task name
     //[ ] search function for Task vector
-//[testing] save tasks vector to file
-// [x] save file after displaying schedule - WORKS
-// [x] save file after adding task - WORKS
-// [x] save file after deleting task - WORKS
-// [x] save file after marking task as done - WORKS
-// [ ] save file after editing task
-//[ ] Figure out why import task done field does not work
+//[tested] save tasks vector to file - works
+// [x] save file after editing task
+//[x] add edit for every field
+//[x] allow edit to take spaces in string by using getline
 //[ ] update tasks every day using ctime, see http://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 
-const int ROWS = 100;
-const int COLS = 9;
-const int BUFFSIZE = 500;
+const int ROWS = 100;//max. # of tasks in input file
+const int COLS = 12;//number of task fields
+const int BUFFSIZE = 900;//maximum size of a task line in input file
 vector<Task> readTasks();
 vector<Task> sortTasks(vector<Task> vec); 
 void saveTasks(vector<Task> t);
@@ -46,10 +42,10 @@ int main() {
     duration length(0,0);
             vector<Task> todo;
             vector<Task> tasks = readTasks();
-while (foo!="4"){
-    cout << endl << "What would you like to do?" << endl << "1: Make a schedule" << endl << "2: Mark Tasks as Done" << endl << "3: Add Tasks" << endl << "4: Edit Tasks"<<endl << "5: Delete Tasks" << endl << "q. Quit" << endl;
+while (foo!="q"){
+    cout << endl << "What would you like to do?" << endl << "s: Make a schedule" << endl << "d: Mark Tasks as Done" << endl << "a: Add Tasks" << endl << "e: Edit Tasks"<<endl << "k: Delete Tasks" << endl << "q. Quit" << endl;
     cin >> foo;
-    if(foo=="1"){
+    if(foo=="s"){
         cout << "How many hours do you have?"<< endl;
         cin >>hours;
         cout << "How many minutes do you have?"<< endl;
@@ -62,7 +58,7 @@ while (foo!="4"){
         tasks=sortTasks(tasks);
         vector<Task>::iterator it = tasks.begin();
         while (min>=0 && it!=tasks.end()){
-            if(it->min <= min) {
+            if((it->min <= min) && (it->done!=1)) {
                 todo.push_back(*it);
                 //cout << it->min << endl;
             min-=it->min;
@@ -71,7 +67,7 @@ while (foo!="4"){
         }
         printSched(todo,length);
     }
-    else if(foo=="2"){
+    else if(foo=="d"){
         int remove,perm;
         printAllTasks(tasks);
         cout<< "What would you like to mark as done?" <<endl;
@@ -86,7 +82,7 @@ while (foo!="4"){
         }
             
         }
-    else if(foo=="3"){
+    else if(foo=="a"){
         Task tt;
         cout << "Enter the name of task: " << endl;
         cin >> tt.what;
@@ -108,6 +104,8 @@ while (foo!="4"){
         cin >> tt.indefinite;
         cout << "Enter repeat" << endl;
         cin >> tt.repeat;
+        cout << "Enter effort" << endl;
+        cin >> tt.effort;
         tasks.push_back(tt);
 
 
@@ -115,7 +113,7 @@ while (foo!="4"){
         }
         
         
-    else if(foo=="4"){
+    else if(foo=="e"){
         Task tt;
         int num,field;
         string newval;
@@ -123,10 +121,13 @@ while (foo!="4"){
         cout<< "Which task would you like to edit?" <<endl;
         cin >> num;
         cout<< "Which field would you like to edit?" <<endl;
-        cout<<"1. Name of task \n 2. Description \n 3. Utility \n 4. Minutes duration \n 5. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 10. Repeat"<<endl;
+        cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
         cin>>field;
         cout<<"Enter the new value"<<endl;
-        cin>>newval;
+        cin.ignore();
+        getline (cin,newval);
+        char *cstr = new char[newval.length() + 1];
+        strcpy(cstr, newval.c_str());
         switch (field){
         case 1:
             tasks[num-1].what=newval;
@@ -134,11 +135,42 @@ while (foo!="4"){
         case 2:
             tasks[num-1].desc=newval;
             break;
+        case 3:
+            tasks[num-1].utils=atoi(cstr);
+            break;
+        case 4:
+            tasks[num-1].min=atoi(cstr);
+            break;
+         case 5:
+            tasks[num-1].indoors=atoi(cstr);
+            break;
+        case 6:
+            tasks[num-1].sedentary=atoi(cstr);
+            break;
+        case 7:
+            tasks[num-1].sleepfriendly=atoi(cstr);
+            break;
+        case 8:
+            tasks[num-1].domain=newval;
+            break;
+        case 9:
+            tasks[num-1].indefinite=atoi(cstr);
+            break;
+        case 10:
+            tasks[num-1].done=atoi(cstr);
+            break;
+        case 11:
+            tasks[num-1].repeat=atoi(cstr);
+            break;
+        case 12:
+            tasks[num-1].effort=atoi(cstr);
+            break;
         default:
             break;
         }
+        //BUG: displays 5 command prompts after this
     }
-    else if(foo=="5"){
+    else if(foo=="k"){
         Task tt;
         int num;
         string newval;
@@ -148,7 +180,7 @@ while (foo!="4"){
         tasks.erase(tasks.begin()+num-1);
     }
     else if(foo=="q"){
-    cout << "Goodbye";
+    cout << "Goodbye"<<endl;
     saveTasks(tasks);
     return 0;
     }
@@ -180,7 +212,14 @@ void printSched(vector<Task> todo, duration length){
 void printAllTasks(vector<Task> todo){
     cout <<endl<< "All your tasks: " << endl;
     for (unsigned int i =0;i<todo.size();i++){
-        cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes"<< endl;
+        cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes";
+        if(todo[i].done==1){
+            cout<<" DONE"<<endl;
+        }
+        else
+        {
+            cout<<endl;
+            }
     }
 }
 
@@ -190,9 +229,9 @@ vector<Task> sortTasks(vector<Task> vec){
     return vec;
 }
 void appendTask(Task& task,ofstream& outfile){
-                cout << task.what << endl;
+                cout << task.what <<" "<< task.done<< endl;
 
-  outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<endl;
+  outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<endl;
   return;
 }
 void saveTasks(vector<Task> tasks){
@@ -219,6 +258,8 @@ vector<Task> readTasks(){
     temptask.sedentary=1;
     temptask.sleepfriendly=1;
     temptask.domain="NA";
+    temptask.done=0;
+    temptask.repeat=0;
   int row, col;
   char buff[BUFFSIZE]; 
   ifstream infile("input.txt");
@@ -251,6 +292,10 @@ vector<Task> readTasks(){
       {temptask.indefinite=atoi(buff);}
       else if(col==9) 
       {temptask.done=atoi(buff);}
+      else if(col==10) 
+      {temptask.repeat=atoi(buff);}
+      else if(col==11) 
+      {temptask.effort=atoi(buff);}
 	  ++col;
 	}
     tasks.push_back(temptask);

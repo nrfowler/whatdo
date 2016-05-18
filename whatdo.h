@@ -13,6 +13,7 @@ class Task{
         bool indefinite; //has no end time; the min is the minimum minutes to spend
         bool done; //This task is done for the day
         int repeat; //0=no; 1=daily; 2=ev 2 days, etc.
+        int effort;
         // void decrementMin(int completed){
             // min-=completed;
         // }
