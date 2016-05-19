@@ -2,3 +2,4 @@ input.txt
 *.exe
 *.o
 whatdo.exe.stackdump
+.gitmessage.txt

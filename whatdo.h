@@ -14,6 +14,7 @@ class Task{
         bool done; //This task is done for the day
         int repeat; //0=no; 1=daily; 2=ev 2 days, etc.
         int effort;
+        string due;
         // void decrementMin(int completed){
             // min-=completed;
         // }
