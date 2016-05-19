@@ -10,16 +10,12 @@
 #include <ctime>
 #include "whatdo.h"
 using namespace std;
-//Summary: mark as done, edit task completed. added "effort" field. Main command prompt now letter based.
-//Details:
-//updated COLS const
-//added repeat field to import and save to file
+//Summary: allow addTask to take spaces in .what, .desc fields
+//Details: used ignore() and getline()
+
+//TODO:
 //[ ] search by task name
     //[ ] search function for Task vector
-//[tested] save tasks vector to file - works
-// [x] save file after editing task
-//[x] add edit for every field
-//[x] allow edit to take spaces in string by using getline
 //[ ] update tasks every day using ctime, see http://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
 
 const int ROWS = 100;//max. # of tasks in input file
@@ -84,10 +80,18 @@ while (foo!="q"){
         }
     else if(foo=="a"){
         Task tt;
+        string newval,newvaldesc;
         cout << "Enter the name of task: " << endl;
-        cin >> tt.what;
+
+        cin.ignore();
+        getline (cin,newval);
+        tt.what=newval;
+        cout << "The new task name is: " <<tt.what<< endl;
         cout << "Enter the description of task: " << endl;
-        cin >> tt.desc;
+        //cin.ignore(); TODO: figure out why this comment is needed
+        getline (cin,newvaldesc);
+        tt.desc=newvaldesc;
+        cout << "The new task description is: " <<tt.desc<< endl;
         cout << "Enter the utility of task: " << endl;
         cin >> tt.utils;
         cout << "Enter the duration of task, in format hours:minutes " << endl;
@@ -229,7 +233,7 @@ vector<Task> sortTasks(vector<Task> vec){
     return vec;
 }
 void appendTask(Task& task,ofstream& outfile){
-                cout << task.what <<" "<< task.done<< endl;
+                //cout << task.what <<" "<< task.done<< endl;
 
   outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<endl;
   return;
