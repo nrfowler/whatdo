@@ -152,19 +152,19 @@ int main(int argc, char* argv[]) {
         }
     }
     else if (argc>1){
-        if(argv[1][1]=="-"){
-            if(*argv[1]=="--add"){
+        if(argv[1][1]=='-'){
+            if(strcmp(argv[1],"--add")==0){
                 //addTask(tasks,what); overload??
             }
-            else if(*argv[1]=="--done"){
+            else if(strcmp(argv[1],"--done")==0){
                 //doneTask(tasks,what); overload??
             }
         }
-        else if(argv[1][1]=="-"){
-            if(*argv[1]=="-a"){
+        else if(argv[1][0]=='-'){
+            if(strcmp(argv[1],"-a")==0){
                 //addTask(tasks,what); overload??
             }
-            else if(*argv[1]=="-d"){
+            else if(strcmp(argv[1],"-d")==0){
                 //doneTask(tasks,what); overload??
             }
         }
