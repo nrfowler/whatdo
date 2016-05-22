@@ -3,3 +3,4 @@ input.txt
 *.o
 whatdo.exe.stackdump
 .gitmessage.txt
+backup/*.*

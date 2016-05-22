@@ -30,6 +30,18 @@ int main(int argc, char* argv[]) {
     string foo;
     duration length(0,0);
     vector<Task> todo;
+    //backup input.txt by creating input{timestamp}.txt
+    time_t t = time(0);   // get time now
+    struct tm * now = localtime( & t );
+    stringstream ss;
+    ss << (now->tm_year + 1900) << '-' 
+         << (now->tm_mon + 1) << '-'
+         <<  now->tm_mday;
+    cout<<ss.str();
+    string backup="backup/input_"+ss.str()+".txt";
+    ifstream  src("input.txt", std::ios::binary);
+    ofstream  dst(backup.c_str(),   std::ios::binary);
+     dst << src.rdbuf();
     vector<Task> tasks = readTasks();
     if(argc==1){
         while (foo!="q"){
@@ -162,12 +174,14 @@ int main(int argc, char* argv[]) {
         }
         else if(argv[1][0]=='-'){
             if(strcmp(argv[1],"-a")==0){
-                //addTask(tasks,what); overload??
+                addTask(tasks); //overload??
             }
             else if(strcmp(argv[1],"-d")==0){
+            cout<<"task doned";
                 //doneTask(tasks,what); overload??
             }
         }
+    saveTasks(tasks);
     }
     
 }
@@ -216,12 +230,11 @@ int addTask(vector<Task>& tasks){
     string newval,newvaldesc;
     cout << "Enter the name of task: " << endl;
 
-    cin.ignore();
+    //cin.ignore();
     getline (cin,newval);
     tt.what=newval;
     cout << "The new task name is: " <<tt.what<< endl;
     cout << "Enter the description of task: " << endl;
-    //cin.ignore(); TODO: figure out why this comment is needed
     getline (cin,newvaldesc);
     tt.desc=newvaldesc;
     cout << "The new task description is: " <<tt.desc<< endl;
@@ -243,16 +256,17 @@ int addTask(vector<Task>& tasks){
     cin >> tt.repeat;
     cout << "Enter effort" << endl;
     cin >> tt.effort;
-    // time_t t = time(0);   // get time now
-    // struct tm * now = localtime( & t );
-    // stringstream ss;
-    // ss << (now->tm_year + 1900) << '-' 
-         // << (now->tm_mon + 1) << '-'
-         // <<  now->tm_mday
-         // << endl;
-    // char * temp;
+    time_t t = time(0);   // get time now
+    struct tm * now = localtime( & t );
+    stringstream ss;
+    ss << (now->tm_year + 1900) << '-' 
+         << (now->tm_mon + 1) << '-'
+         <<  now->tm_mday
+         << endl;
+     //char * temp=NULL;
     // ss.getline(temp, 200, ',' );
-    // tt.due=temp;
+    // string str(temp);
+    tt.due=ss.str();
      tasks.push_back(tt);
     return 1;
         }
