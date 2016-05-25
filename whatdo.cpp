@@ -23,11 +23,15 @@ void printAllTasks(vector<Task> todo);
 int addTask(vector<Task>& tasks);
 void doneTask(vector<Task>& tasks);
 void editTask(vector<Task> &tasks);
+int addTask(vector<Task>& tasks,string name);
+void doneTask(vector<Task>& tasks,string name);
+void editTask(vector<Task> &tasks,string name);
 duration mins2duration(int mins){
     duration temp(mins/60,mins%60);
     return temp;
     };
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
+cout <<"test";
     int hours, minutes;
     string foo;
     duration length(0,0);
@@ -39,7 +43,7 @@ int main(int argc, char* argv[]) {
     ss << (now->tm_year + 1900) << '-' 
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday;
-    cout<<ss.str();
+    //cout<<ss.str();
     string backup="backup/input_"+ss.str()+".txt";
     ifstream  src("input.txt", std::ios::binary);
     ofstream  dst(backup.c_str(),   std::ios::binary);
@@ -100,27 +104,55 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    else if (argc>1){
+    else if (argc==2){
         if(argv[1][1]=='-'){
             if(strcmp(argv[1],"--add")==0){
-                //addTask(tasks,what); overload??
+                addTask(tasks);
             }
             else if(strcmp(argv[1],"--done")==0){
-                //doneTask(tasks,what); overload??
+                doneTask(tasks);
             }
         }
         else if(argv[1][0]=='-'){
             if(strcmp(argv[1],"-a")==0){
-                addTask(tasks); //overload??
+                addTask(tasks);
             }
             else if(strcmp(argv[1],"-d")==0){
             cout<<"task doned";
-                //doneTask(tasks,what); overload??
+                doneTask(tasks);
             }
         }
+        else cout<<"Error"<<endl;
     saveTasks(tasks);
     }
-    
+    else if (argc>2){
+    cout << "test";
+        string args;
+        for (int i =1;i<=argc+1;i++){
+            args+=string(argv[i])+" ";
+            }
+        cout << "test";
+        if(argv[1][1]=='-'){
+            if(strcmp(argv[1],"--add")==0){
+                // addTask(tasks);
+            }
+            else if(strcmp(argv[1],"--done")==0){
+                // doneTask(tasks);
+            }
+        }
+        else if(argv[1][0]=='-'){
+            if(strcmp(argv[1],"-a")==0){
+                // addTask(tasks);
+            }
+            else if(strcmp(argv[1],"-d")==0){
+            cout<<"task doned";
+                // doneTask(tasks,what);
+            }
+        }
+        else cout<<"Error"<<endl;
+    saveTasks(tasks);
+    }
+    else cout<<"Error"<<endl;
 }
 
 void editTask(vector<Task> &tasks){
@@ -134,6 +166,65 @@ void editTask(vector<Task> &tasks){
                 printAllTasks(tasks);
                 cout<< "Which task would you like to edit?" <<endl;
                 cin >> num;
+                cout<< "Which field would you like to edit?" <<endl;
+                cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
+                cin>>field;
+                cout<<"Enter the new value"<<endl;
+                cin.ignore();
+                getline (cin,newval);
+                char *cstr = new char[newval.length() + 1];
+                strcpy(cstr, newval.c_str());
+                switch (field){
+                case 1:
+                    tasks[num-1].what=newval;
+                    break;
+                case 2:
+                    tasks[num-1].desc=newval;
+                    break;
+                case 3:
+                    tasks[num-1].utils=atoi(cstr);
+                    break;
+                case 4:
+                    tasks[num-1].min=atoi(cstr);
+                    break;
+                 case 5:
+                    tasks[num-1].indoors=atoi(cstr);
+                    break;
+                case 6:
+                    tasks[num-1].sedentary=atoi(cstr);
+                    break;
+                case 7:
+                    tasks[num-1].sleepfriendly=atoi(cstr);
+                    break;
+                case 8:
+                    tasks[num-1].domain=newval;
+                    break;
+                case 9:
+                    tasks[num-1].indefinite=atoi(cstr);
+                    break;
+                case 10:
+                    tasks[num-1].done=atoi(cstr);
+                    break;
+                case 11:
+                    tasks[num-1].repeat=atoi(cstr);
+                    break;
+                case 12:
+                    tasks[num-1].effort=atoi(cstr);
+                    break;
+                default:
+                    break;
+                    }
+                    }
+void editTask(vector<Task> &tasks, string name){
+    if(tasks.size()==0){
+                        cout<<"No tasks found"<<endl;
+                           return;
+                    }
+                Task tt;
+                int num,field;
+                string newval;
+                printAllTasks(tasks);
+                //search for task name
                 cout<< "Which field would you like to edit?" <<endl;
                 cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
                 cin>>field;
@@ -201,6 +292,24 @@ void doneTask(vector<Task> &tasks){
         tasks[remove-1].done=1;
     }
     }
+void doneTask(vector<Task> &tasks, string name){
+    int remove,perm;
+    if(tasks.size()==0){
+        cout<<"No tasks found"<<endl;
+        return;
+    }
+    printAllTasks(tasks);
+    //search for task name
+    perm=0; //implement repeat task test here
+    if(perm){
+        tasks.erase(tasks.begin()+remove-1);
+    }
+    else {
+        tasks[remove-1].done=1;
+    }
+    cout <<"This task has been marked done"<<endl;
+    return;
+}
 void printSched(vector<Task> todo, duration length){
 if(todo.size()==0){
 cout<<"No tasks found"<<endl;
@@ -239,6 +348,48 @@ void printAllTasks(vector<Task> todo){
             cout<<endl;
             }
     }
+}
+int addTask(vector<Task>& tasks, string name){
+    Task tt;
+    string newval,newvaldesc;
+    cout << "Enter the name of task: " << endl;
+    tt.what=name;
+    cout << "The new task name is: " <<tt.what<< endl;
+    cout << "Enter the description of task: " << endl;
+    getline (cin,newvaldesc);
+    tt.desc=newvaldesc;
+    cout << "The new task description is: " <<tt.desc<< endl;
+    cout << "Enter the utility of task: " << endl;
+    cin >> tt.utils;
+    cout << "Enter the duration of task, in total minutes " << endl;
+    cin >> tt.min;
+    cout << "Enter 1 if the task is indoors" << endl;
+    cin >> tt.indoors;
+    cout << "Enter 1 if the task is sedentary" << endl;
+    cin >> tt.sedentary;
+    cout << "Enter 1 if the task is sleep friendly" << endl;
+    cin >> tt.sleepfriendly;
+    cout << "Enter the domain" << endl;
+    cin >> tt.domain;
+    cout << "Enter 1 if the task is indefinite" << endl;
+    cin >> tt.indefinite;
+    cout << "Enter repeat" << endl;
+    cin >> tt.repeat;
+    cout << "Enter effort" << endl;
+    cin >> tt.effort;
+    time_t t = time(0);   // get time now
+    struct tm * now = localtime( & t );
+    stringstream ss;
+    ss << (now->tm_year + 1900) << '-' 
+         << (now->tm_mon + 1) << '-'
+         <<  now->tm_mday
+         << endl;
+     //char * temp=NULL;
+    // ss.getline(temp, 200, ',' );
+    // string str(temp);
+    tt.due=ss.str();
+     tasks.push_back(tt);
+    return 1;
 }
 int addTask(vector<Task>& tasks){
     Task tt;
@@ -323,16 +474,6 @@ vector<Task> readTasks(){
     temptask.done=0;
     temptask.repeat=0;
     temptask.due="2016-5-19";
-    //time_t t = time(0);
-    //struct tm * now = localtime( & t );
-    // stringstream sst;
-    // sst << (now->tm_year + 1900) << '-' 
-         // << (now->tm_mon + 1) << '-'
-         // <<  now->tm_mday
-         // << endl;
-    // char * tempt;
-    // sst.getline(tempt, 20, ',' );
-    // temptask.due=tempt;
   int row, col;
   char buff[BUFFSIZE]; 
   ifstream infile("input.txt");
