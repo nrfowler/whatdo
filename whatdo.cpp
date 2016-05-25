@@ -21,6 +21,8 @@ void printSched(vector<Task> vec, duration length);
 void rmEmptyLines();
 void printAllTasks(vector<Task> todo);
 int addTask(vector<Task>& tasks);
+void doneTask(vector<Task>& tasks);
+void editTask(vector<Task> &tasks);
 duration mins2duration(int mins){
     duration temp(mins/60,mins%60);
     return temp;
@@ -56,7 +58,6 @@ int main(int argc, char* argv[]) {
                 length.minutes=minutes;
                 todo.clear();
                 int min=hours*60+minutes;
-                tasks = readTasks();
                 tasks=sortTasks(tasks);
                 vector<Task>::iterator it = tasks.begin();
                 //possible bug here when utils or min are equal in multiple tasks
@@ -71,19 +72,7 @@ int main(int argc, char* argv[]) {
                 printSched(todo,length);
             }
             else if(foo=="d"){
-                int remove,perm;
-                printAllTasks(tasks);
-                cout<< "What would you like to mark as done?" <<endl;
-                cin >> remove;
-                cout <<"This task has been marked done"<<endl;
-                perm=0; //implement repeat task test here
-                if(perm){
-                    tasks.erase(tasks.begin()+remove-1);
-                }
-                else {
-                    tasks[remove-1].done=1;
-                }
-                    
+                    doneTask(tasks);
                 }
             else if(foo=="a"){
               addTask(tasks);
@@ -91,6 +80,54 @@ int main(int argc, char* argv[]) {
                 
                 
             else if(foo=="e"){
+                    editTask(tasks);
+                }
+                //BUG: displays 5 command prompts after this
+            
+            else if(foo=="k"){
+                Task tt;
+                int num;
+                string newval;
+                printAllTasks(tasks);
+                cout<< "Which task would you like to delete?" <<endl;
+                cin >> num;
+                tasks.erase(tasks.begin()+num-1);
+            }
+            else if(foo=="q"){
+            cout << "Goodbye"<<endl;
+            saveTasks(tasks);
+            return 0;
+            }
+        }
+    }
+    else if (argc>1){
+        if(argv[1][1]=='-'){
+            if(strcmp(argv[1],"--add")==0){
+                //addTask(tasks,what); overload??
+            }
+            else if(strcmp(argv[1],"--done")==0){
+                //doneTask(tasks,what); overload??
+            }
+        }
+        else if(argv[1][0]=='-'){
+            if(strcmp(argv[1],"-a")==0){
+                addTask(tasks); //overload??
+            }
+            else if(strcmp(argv[1],"-d")==0){
+            cout<<"task doned";
+                //doneTask(tasks,what); overload??
+            }
+        }
+    saveTasks(tasks);
+    }
+    
+}
+
+void editTask(vector<Task> &tasks){
+    if(tasks.size()==0){
+                        cout<<"No tasks found"<<endl;
+                           return;
+                    }
                 Task tt;
                 int num,field;
                 string newval;
@@ -144,48 +181,26 @@ int main(int argc, char* argv[]) {
                     break;
                 default:
                     break;
-                }
-                //BUG: displays 5 command prompts after this
-            }
-            else if(foo=="k"){
-                Task tt;
-                int num;
-                string newval;
-                printAllTasks(tasks);
-                cout<< "Which task would you like to delete?" <<endl;
-                cin >> num;
-                tasks.erase(tasks.begin()+num-1);
-            }
-            else if(foo=="q"){
-            cout << "Goodbye"<<endl;
-            saveTasks(tasks);
-            return 0;
-            }
-        }
+                    }
+                    }
+void doneTask(vector<Task> &tasks){
+    int remove,perm;
+    if(tasks.size()==0){
+        cout<<"No tasks found"<<endl;
+        return;
     }
-    else if (argc>1){
-        if(argv[1][1]=='-'){
-            if(strcmp(argv[1],"--add")==0){
-                //addTask(tasks,what); overload??
-            }
-            else if(strcmp(argv[1],"--done")==0){
-                //doneTask(tasks,what); overload??
-            }
-        }
-        else if(argv[1][0]=='-'){
-            if(strcmp(argv[1],"-a")==0){
-                addTask(tasks); //overload??
-            }
-            else if(strcmp(argv[1],"-d")==0){
-            cout<<"task doned";
-                //doneTask(tasks,what); overload??
-            }
-        }
-    saveTasks(tasks);
+    printAllTasks(tasks);
+    cout<< "What would you like to mark as done?" <<endl;
+    cin >> remove;
+    cout <<"This task has been marked done"<<endl;
+    perm=0; //implement repeat task test here
+    if(perm){
+        tasks.erase(tasks.begin()+remove-1);
     }
-    
-}
-
+    else {
+        tasks[remove-1].done=1;
+    }
+    }
 void printSched(vector<Task> todo, duration length){
 if(todo.size()==0){
 cout<<"No tasks found"<<endl;
@@ -240,7 +255,7 @@ int addTask(vector<Task>& tasks){
     cout << "The new task description is: " <<tt.desc<< endl;
     cout << "Enter the utility of task: " << endl;
     cin >> tt.utils;
-    cout << "Enter the duration of task, in format hours:minutes " << endl;
+    cout << "Enter the duration of task, in total minutes " << endl;
     cin >> tt.min;
     cout << "Enter 1 if the task is indoors" << endl;
     cin >> tt.indoors;
