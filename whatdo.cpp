@@ -31,7 +31,7 @@ duration mins2duration(int mins){
     return temp;
     };
 int main(int argc, char** argv) {
-cout <<"test";
+std::cout << argc << std::endl ;
     int hours, minutes;
     string foo;
     duration length(0,0);
@@ -43,7 +43,6 @@ cout <<"test";
     ss << (now->tm_year + 1900) << '-' 
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday;
-    //cout<<ss.str();
     string backup="backup/input_"+ss.str()+".txt";
     ifstream  src("input.txt", std::ios::binary);
     ofstream  dst(backup.c_str(),   std::ios::binary);
@@ -126,33 +125,37 @@ cout <<"test";
     saveTasks(tasks);
     }
     else if (argc>2){
-    cout << "test";
+    std::cout << argc << std::endl ;
         string args;
         for (int i =1;i<=argc+1;i++){
             args+=string(argv[i])+" ";
+        std::cout << args<<" "<<argv[i]<<" "<<argv[1][0]<<" " << std::endl ;
             }
-        cout << "test";
         if(argv[1][1]=='-'){
+        std::cout << "c" << std::flush;
             if(strcmp(argv[1],"--add")==0){
-                // addTask(tasks);
+                addTask(tasks,args);
             }
             else if(strcmp(argv[1],"--done")==0){
-                // doneTask(tasks);
+                //doneTask(tasks,argv[2]);
             }
         }
-        else if(argv[1][0]=='-'){
+        else {
+        std::cout << "a" << std::endl ;
             if(strcmp(argv[1],"-a")==0){
-                // addTask(tasks);
+            std::cout << "b" << std::endl ;
+                addTask(tasks,args);
+                cout << "test"<<endl;
             }
             else if(strcmp(argv[1],"-d")==0){
             cout<<"task doned";
                 // doneTask(tasks,what);
             }
         }
-        else cout<<"Error"<<endl;
+        //else std::cout << "error" << std::endl ;
     saveTasks(tasks);
     }
-    else cout<<"Error"<<endl;
+    else std::cout << "error" << std::endl ;
 }
 
 void editTask(vector<Task> &tasks){
@@ -352,12 +355,8 @@ void printAllTasks(vector<Task> todo){
 int addTask(vector<Task>& tasks, string name){
     Task tt;
     string newval,newvaldesc;
-    cout << "Enter the name of task: " << endl;
     tt.what=name;
-    cout << "The new task name is: " <<tt.what<< endl;
-    cout << "Enter the description of task: " << endl;
-    getline (cin,newvaldesc);
-    tt.desc=newvaldesc;
+    tt.desc="test";
     cout << "The new task description is: " <<tt.desc<< endl;
     cout << "Enter the utility of task: " << endl;
     cin >> tt.utils;
