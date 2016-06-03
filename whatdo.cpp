@@ -31,7 +31,6 @@ duration mins2duration(int mins){
     return temp;
     };
 int main(int argc, char** argv) {
-std::cout << argc << std::endl ;
     int hours, minutes;
     string foo;
     duration length(0,0);
@@ -67,7 +66,6 @@ std::cout << argc << std::endl ;
                 while (min>=0 && it!=tasks.end()){
                     if((it->min <= min) && (it->done!=1)) {
                         todo.push_back(*it);
-                        //cout << it->min << endl;
                     min-=it->min;
                     }
                     it++;
@@ -125,14 +123,12 @@ std::cout << argc << std::endl ;
     saveTasks(tasks);
     }
     else if (argc>2){
-    std::cout << argc << std::endl ;
         string args;
-        for (int i =1;i<=argc+1;i++){
+        for (int i =2;i<argc;i++){
             args+=string(argv[i])+" ";
-        std::cout << args<<" "<<argv[i]<<" "<<argv[1][0]<<" " << std::endl ;
+        std::cout << args<<" "<<argv[i]<<" "<<" " << std::endl ;
             }
         if(argv[1][1]=='-'){
-        std::cout << "c" << std::flush;
             if(strcmp(argv[1],"--add")==0){
                 addTask(tasks,args);
             }
@@ -141,9 +137,7 @@ std::cout << argc << std::endl ;
             }
         }
         else {
-        std::cout << "a" << std::endl ;
             if(strcmp(argv[1],"-a")==0){
-            std::cout << "b" << std::endl ;
                 addTask(tasks,args);
                 cout << "test"<<endl;
             }
@@ -152,12 +146,10 @@ std::cout << argc << std::endl ;
                 // doneTask(tasks,what);
             }
         }
-        //else std::cout << "error" << std::endl ;
     saveTasks(tasks);
     }
     else std::cout << "error" << std::endl ;
 }
-
 void editTask(vector<Task> &tasks){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
@@ -338,7 +330,6 @@ return;
             }
         }
 }
-
 void printAllTasks(vector<Task> todo){
     cout <<endl<< "All your tasks: " << endl;
     for (unsigned int i =0;i<todo.size();i++){
@@ -360,6 +351,7 @@ int addTask(vector<Task>& tasks, string name){
     cout << "The new task description is: " <<tt.desc<< endl;
     cout << "Enter the utility of task: " << endl;
     cin >> tt.utils;
+    cin.ignore();
     cout << "Enter the duration of task, in total minutes " << endl;
     cin >> tt.min;
     cout << "Enter 1 if the task is indoors" << endl;
@@ -383,9 +375,6 @@ int addTask(vector<Task>& tasks, string name){
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday
          << endl;
-     //char * temp=NULL;
-    // ss.getline(temp, 200, ',' );
-    // string str(temp);
     tt.due=ss.str();
      tasks.push_back(tt);
     return 1;
@@ -395,7 +384,7 @@ int addTask(vector<Task>& tasks){
     string newval,newvaldesc;
     cout << "Enter the name of task: " << endl;
 
-    //cin.ignore();
+    cin.ignore();
     getline (cin,newval);
     tt.what=newval;
     cout << "The new task name is: " <<tt.what<< endl;
@@ -428,9 +417,6 @@ int addTask(vector<Task>& tasks){
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday
          << endl;
-     //char * temp=NULL;
-    // ss.getline(temp, 200, ',' );
-    // string str(temp);
     tt.due=ss.str();
      tasks.push_back(tt);
     return 1;
@@ -441,7 +427,6 @@ vector<Task> sortTasks(vector<Task> vec){
     return vec;
 }
 void appendTask(Task& task,ofstream& outfile){
-                //cout << task.what <<" "<< task.done<< endl;
 
   outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<","<<task.due<<endl;
   return;
@@ -452,13 +437,11 @@ void saveTasks(vector<Task> tasks){
     while (it!=tasks.end()){
             
                 appendTask(*it,outfile);
-                //cout << it->what << endl;
             
             it++;
         }
     outfile.close();
 }
-
 vector<Task> readTasks(){
     vector<Task> tasks;
     string scoreline, temp;
@@ -479,7 +462,7 @@ vector<Task> readTasks(){
   stringstream ss;
 
   row = 0;
-  while( infile.getline( buff,  BUFFSIZE ) && row < ROWS ) {
+  while( infile.getline( buff,  BUFFSIZE ) && row < ROWS) {
 	ss << buff;
 
 	col = 0;
@@ -513,7 +496,9 @@ vector<Task> readTasks(){
       {temptask.due=buff;}
 	  ++col;
 	}
+    if(col==COLS){ //make sure task had enough fields
     tasks.push_back(temptask);
+    }
 
 	ss << "";
 
@@ -521,9 +506,7 @@ vector<Task> readTasks(){
 	++row;
   }
 
-	// for( int _col = 0; _col < 10; ++_col ) {
-	// }
-	// cout << endl;
+
   infile.close();
 
 
