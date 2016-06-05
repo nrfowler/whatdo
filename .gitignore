@@ -5,3 +5,8 @@ whatdo.exe.stackdump
 .gitmessage.txt
 backup/*.*
 todo.txt
+*.cbp
+bin/*
+obj/*
+*.depend
+*.layout

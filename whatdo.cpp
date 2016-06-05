@@ -14,7 +14,7 @@ const int ROWS = 100;//max. # of tasks in input file
 const int COLS = 13;//number of task fields
 const int BUFFSIZE = 900;//maximum size of a task line in input file
 vector<Task> readTasks();
-vector<Task> sortTasks(vector<Task> vec); 
+vector<Task> sortTasks(vector<Task> vec);
 void saveTasks(vector<Task> t);
 void appendTask(Task& task,ofstream& outfile);
 void printSched(vector<Task> vec, duration length);
@@ -24,11 +24,11 @@ int addTask(vector<Task>& tasks);
 void doneTask(vector<Task>& tasks);
 void editTask(vector<Task> &tasks);
 int addTask(vector<Task>& tasks,string name);
-void doneTask(vector<Task>& tasks,char* name);
-void editTask(vector<Task> &tasks,char* name);
+void doneTask(vector<Task>& tasks,string name);
+void editTask(vector<Task> &tasks,string name);
 int searchString(vector<string> query, vector<string> record);
 vector<string> getStrings(vector<Task> tasks);
-vector<string> parseQuery(char* in);
+vector<string> parseQuery(string in);
 duration mins2duration(int mins){
     duration temp(mins/60,mins%60);
     return temp;
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
     stringstream ss;
-    ss << (now->tm_year + 1900) << '-' 
+    ss << (now->tm_year + 1900) << '-'
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday;
     string backup="backup/input_"+ss.str()+".txt";
@@ -81,13 +81,13 @@ int main(int argc, char** argv) {
             else if(foo=="a"){
               addTask(tasks);
                 }
-                
-                
+
+
             else if(foo=="e"){
                     editTask(tasks);
                 }
                 //BUG: displays 5 command prompts after this
-            
+
             else if(foo=="k"){
                 Task tt;
                 int num;
@@ -131,17 +131,17 @@ int main(int argc, char** argv) {
             args+=string(argv[i])+" ";
         //std::cout << args<<" "<<argv[i]<<" "<<" " << std::endl ;//delete
             }
-        char * argschr = new char[args.length() + 1];
-        strcpy(argschr, args.c_str());
+        //char * argschr = new char[args.length() + 1];
+        //strcpy(argschr, args.c_str());
         if(argv[1][1]=='-'){
             if(strcmp(argv[1],"--add")==0){
                 addTask(tasks,args);
             }
             else if(strcmp(argv[1],"--done")==0){
-                doneTask(tasks,argschr);
+                doneTask(tasks,args);
             }
             else if(strcmp(argv[1],"--edit")==0){
-                editTask(tasks,argschr);
+                editTask(tasks,args);
             }
         }
         else {
@@ -149,12 +149,10 @@ int main(int argc, char** argv) {
                 addTask(tasks,args);
             }
             else if(strcmp(argv[1],"-d")==0){
-            cout<<"task doned";
-                doneTask(tasks,argschr);
+                doneTask(tasks,args);
             }
             else if(strcmp(argv[1],"-e")==0){
-            cout<<"task doned";
-                editTask(tasks,argschr);
+                editTask(tasks,args);
             }
         }
     saveTasks(tasks);
@@ -221,7 +219,7 @@ void editTask(vector<Task> &tasks){
                     break;
                     }
                     }
-void editTask(vector<Task> &tasks, char* name){
+void editTask(vector<Task> &tasks, string name){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
                            return;
@@ -300,56 +298,66 @@ void doneTask(vector<Task> &tasks){
         tasks[remove-1].done=1;
     }
     }
-void doneTask(vector<Task> &tasks, char* name){
+void doneTask(vector<Task> &tasks, string name){
     int remove,perm;
+    vector<string> query (15);
+    vector<string> taskstrings (tasks.size());
     if(tasks.size()==0){
         cout<<"No tasks found"<<endl;
         return;
     }
     //printAllTasks(tasks);
-    vector<string> query=parseQuery(name);
+    query=parseQuery(name);
+    cout<<query.size()<<endl;
     //remove "the"
-    vector<string> taskstrings=getStrings(tasks);
+    taskstrings=getStrings(tasks);
+    cout<<query[0]<<endl;
     remove=searchString(query,taskstrings);
     perm=0; //implement repeat task test here
     if(perm){
-        tasks.erase(tasks.begin()+remove-1);
+        tasks.erase(tasks.begin()+remove);
     }
     else {
-        tasks[remove-1].done=1;
+        tasks[remove].done=1;
     }
     cout <<"This task has been marked done"<<endl;
     return;
 }
 vector<string> getStrings(vector<Task> tasks){
-    vector<string> names;
-    for (int i =0;i++;i<tasks.size()){
-        names[i]=tasks[i].what+" "+tasks[i].desc;
+    vector<string> names (tasks.size());
+    for (int i =0;i<tasks.size();i++){
+        names[i]=tasks[i].what;
     }
     return names;
     }
-vector<string> parseQuery(char* in){
-    char * pch;
+vector<string> parseQuery(string in){
+    istringstream ss(in);
+    string buff;
     int i=0;
-    vector<string> out;
-    pch = strtok (in," ,");
-  while (pch != NULL)
+    vector<string> out(15);
+    while (getline( ss,buff, ' ' ))
   {
-    out[i]=string(pch);
-    printf ("%s\n",out[i]);
-    pch = strtok (NULL, " ,");
+    out[i]=buff;
     i++;
   }
+  out.resize(i);
   return out;
     }
+    //record needs to be converted into 2d array, or searchString has to parse record
 int searchString(vector<string> query, vector<string> record){
-    int score,rid,maxscore=0;
-    for (int i =0;i++;i<record.size()){
-        for (int j =0;j++;j<query.size()){
+    int score,rid=1,maxscore=0;
+                cout <<record.size()<<"test"<<endl;
+
+    for (int i =0;i<record.size();i++){
             score =0;
-            if(strcmp(query[j].c_str(),record[j].c_str())==0)score+=3;
+        for (int j =0;j<query.size();j++){
+            cout <<query[j]<<" "<<record[i]<<" "<<endl;
+
+            if(query[j].compare(record[i])==0){
+                score+=3;
+            }
             //else if(_stricmp(query[j],record[j])==0)score+=2;
-            //string compare case insensitive in description score+=1
+            //string compare case insensitive din description score+=1
         }
         if(score>maxscore){
         maxscore=score;
@@ -423,7 +431,7 @@ int addTask(vector<Task>& tasks, string name){
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
     stringstream ss;
-    ss << (now->tm_year + 1900) << '-' 
+    ss << (now->tm_year + 1900) << '-'
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday
          << endl;
@@ -465,7 +473,7 @@ int addTask(vector<Task>& tasks){
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
     stringstream ss;
-    ss << (now->tm_year + 1900) << '-' 
+    ss << (now->tm_year + 1900) << '-'
          << (now->tm_mon + 1) << '-'
          <<  now->tm_mday
          << endl;
@@ -487,9 +495,9 @@ void saveTasks(vector<Task> tasks){
     vector<Task>::iterator it = tasks.begin();
     ofstream outfile("input.txt");
     while (it!=tasks.end()){
-            
+
                 appendTask(*it,outfile);
-            
+
             it++;
         }
     outfile.close();
@@ -509,7 +517,7 @@ vector<Task> readTasks(){
     temptask.repeat=0;
     temptask.due="2016-5-19";
   int row, col;
-  char buff[BUFFSIZE]; 
+  char buff[BUFFSIZE];
   ifstream infile("input.txt");
   stringstream ss;
 
@@ -520,31 +528,31 @@ vector<Task> readTasks(){
 	col = 0;
 	while( ss.getline( buff, 200, ',' ) && col < COLS ) {
 
-      if(col==0) 
+      if(col==0)
       {temptask.what=buff;}
-      else if(col==1) 
+      else if(col==1)
       {temptask.desc=buff;}
-      else if(col==2) 
+      else if(col==2)
       {temptask.utils=atoi(buff);}
-      else if(col==3) 
+      else if(col==3)
       {temptask.min=atoi(buff);}
-      else if(col==4) 
+      else if(col==4)
       {temptask.indoors=atoi(buff);}
-      else if(col==5) 
+      else if(col==5)
       {temptask.sedentary=atoi(buff);}
-      else if(col==6) 
+      else if(col==6)
       {temptask.sleepfriendly=atoi(buff);}
-      else if(col==7) 
+      else if(col==7)
       {temptask.domain=buff;}
-      else if(col==8) 
+      else if(col==8)
       {temptask.indefinite=atoi(buff);}
-      else if(col==9) 
+      else if(col==9)
       {temptask.done=atoi(buff);}
-      else if(col==10) 
+      else if(col==10)
       {temptask.repeat=atoi(buff);}
-      else if(col==11) 
+      else if(col==11)
       {temptask.effort=atoi(buff);}
-      else if(col==12) 
+      else if(col==12)
       {temptask.due=buff;}
 	  ++col;
 	}
