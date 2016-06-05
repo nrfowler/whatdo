@@ -24,8 +24,11 @@ int addTask(vector<Task>& tasks);
 void doneTask(vector<Task>& tasks);
 void editTask(vector<Task> &tasks);
 int addTask(vector<Task>& tasks,string name);
-void doneTask(vector<Task>& tasks,string name);
-void editTask(vector<Task> &tasks,string name);
+void doneTask(vector<Task>& tasks,char* name);
+void editTask(vector<Task> &tasks,char* name);
+int searchString(vector<string> query, vector<string> record);
+vector<string> getStrings(vector<Task> tasks);
+vector<string> parseQuery(char* in);
 duration mins2duration(int mins){
     duration temp(mins/60,mins%60);
     return temp;
@@ -126,24 +129,32 @@ int main(int argc, char** argv) {
         string args;
         for (int i =2;i<argc;i++){
             args+=string(argv[i])+" ";
-        std::cout << args<<" "<<argv[i]<<" "<<" " << std::endl ;
+        //std::cout << args<<" "<<argv[i]<<" "<<" " << std::endl ;//delete
             }
+        char * argschr = new char[args.length() + 1];
+        strcpy(argschr, args.c_str());
         if(argv[1][1]=='-'){
             if(strcmp(argv[1],"--add")==0){
                 addTask(tasks,args);
             }
             else if(strcmp(argv[1],"--done")==0){
-                //doneTask(tasks,argv[2]);
+                doneTask(tasks,argschr);
+            }
+            else if(strcmp(argv[1],"--edit")==0){
+                editTask(tasks,argschr);
             }
         }
         else {
             if(strcmp(argv[1],"-a")==0){
                 addTask(tasks,args);
-                cout << "test"<<endl;
             }
             else if(strcmp(argv[1],"-d")==0){
             cout<<"task doned";
-                // doneTask(tasks,what);
+                doneTask(tasks,argschr);
+            }
+            else if(strcmp(argv[1],"-e")==0){
+            cout<<"task doned";
+                editTask(tasks,argschr);
             }
         }
     saveTasks(tasks);
@@ -210,7 +221,7 @@ void editTask(vector<Task> &tasks){
                     break;
                     }
                     }
-void editTask(vector<Task> &tasks, string name){
+void editTask(vector<Task> &tasks, char* name){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
                            return;
@@ -218,8 +229,10 @@ void editTask(vector<Task> &tasks, string name){
                 Task tt;
                 int num,field;
                 string newval;
-                printAllTasks(tasks);
                 //search for task name
+                vector<string> query=parseQuery(name);
+                vector<string> taskstrings=getStrings(tasks);
+                num=searchString(query,taskstrings);
                 cout<< "Which field would you like to edit?" <<endl;
                 cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
                 cin>>field;
@@ -287,14 +300,17 @@ void doneTask(vector<Task> &tasks){
         tasks[remove-1].done=1;
     }
     }
-void doneTask(vector<Task> &tasks, string name){
+void doneTask(vector<Task> &tasks, char* name){
     int remove,perm;
     if(tasks.size()==0){
         cout<<"No tasks found"<<endl;
         return;
     }
-    printAllTasks(tasks);
-    //search for task name
+    //printAllTasks(tasks);
+    vector<string> query=parseQuery(name);
+    //remove "the"
+    vector<string> taskstrings=getStrings(tasks);
+    remove=searchString(query,taskstrings);
     perm=0; //implement repeat task test here
     if(perm){
         tasks.erase(tasks.begin()+remove-1);
@@ -304,6 +320,42 @@ void doneTask(vector<Task> &tasks, string name){
     }
     cout <<"This task has been marked done"<<endl;
     return;
+}
+vector<string> getStrings(vector<Task> tasks){
+    vector<string> names;
+    for (int i =0;i++;i<tasks.size()){
+        names[i]=tasks[i].what+" "+tasks[i].desc;
+    }
+    return names;
+    }
+vector<string> parseQuery(char* in){
+    char * pch;
+    int i=0;
+    vector<string> out;
+    pch = strtok (in," ,");
+  while (pch != NULL)
+  {
+    out[i]=string(pch);
+    printf ("%s\n",out[i]);
+    pch = strtok (NULL, " ,");
+    i++;
+  }
+  return out;
+    }
+int searchString(vector<string> query, vector<string> record){
+    int score,rid,maxscore=0;
+    for (int i =0;i++;i<record.size()){
+        for (int j =0;j++;j<query.size()){
+            score =0;
+            if(strcmp(query[j].c_str(),record[j].c_str())==0)score+=3;
+            //else if(_stricmp(query[j],record[j])==0)score+=2;
+            //string compare case insensitive in description score+=1
+        }
+        if(score>maxscore){
+        maxscore=score;
+            rid=i;};
+            }
+    return rid;
 }
 void printSched(vector<Task> todo, duration length){
 if(todo.size()==0){
