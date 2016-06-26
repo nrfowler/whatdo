@@ -13,22 +13,7 @@ using namespace std;
 const int ROWS = 100;//max. # of tasks in input file
 const int COLS = 13;//number of task fields
 const int BUFFSIZE = 900;//maximum size of a task line in input file
-vector<Task> readTasks();
-vector<Task> sortTasks(vector<Task> vec);
-void saveTasks(vector<Task> t);
-void appendTask(Task& task,ofstream& outfile);
-void printSched(vector<Task> vec, duration length);
-void rmEmptyLines();
-void printAllTasks(vector<Task> todo);
-int addTask(vector<Task>& tasks);
-void doneTask(vector<Task>& tasks);
-void editTask(vector<Task> &tasks);
-int addTask(vector<Task>& tasks,string name);
-void doneTask(vector<Task>& tasks,string name);
-void editTask(vector<Task> &tasks,string name);
-int searchString(vector<string> query, vector<string> record);
-vector<string> getStrings(vector<Task> tasks);
-vector<string> parseQuery(string in);
+//convert @mins to duration object; not currently in use
 duration mins2duration(int mins){
     duration temp(mins/60,mins%60);
     return temp;
@@ -38,7 +23,7 @@ int main(int argc, char** argv) {
     string foo;
     duration length(0,0);
     vector<Task> todo;
-    //backup input.txt by creating input{timestamp}.txt
+    //backups input.txt by creating input{timestamp}.txt
     time_t t = time(0);   // get time now
     struct tm * now = localtime( & t );
     stringstream ss;
@@ -52,7 +37,7 @@ int main(int argc, char** argv) {
     vector<Task> tasks = readTasks();
     if(argc==1){
         while (foo!="q"){
-            cout << endl << "What would you like to do?" << endl << "s: Make a schedule" << endl << "d: Mark Tasks as Done" << endl << "a: Add Tasks" << endl << "e: Edit Tasks"<<endl << "k: Delete Tasks" << endl << "q. Quit" << endl;
+            cout << endl << "What would you like to do?" << endl << "s: Make a schedule" << endl << "d: Mark Tasks as Done" << endl << "a: Add Tasks" << endl << "e: Edit Tasks"<<endl << "k: Delete Tasks" << endl << "p: Print All Tasks"<<endl << "q. Quit" << endl;
             cin >> foo;
             if(foo=="s"){
                 cout << "How many hours do you have?"<< endl;
@@ -65,7 +50,6 @@ int main(int argc, char** argv) {
                 int min=hours*60+minutes;
                 tasks=sortTasks(tasks);
                 vector<Task>::iterator it = tasks.begin();
-                //possible bug here when utils or min are equal in multiple tasks
                 while (min>=0 && it!=tasks.end()){
                     if((it->min <= min) && (it->done!=1)) {
                         todo.push_back(*it);
@@ -78,6 +62,9 @@ int main(int argc, char** argv) {
             else if(foo=="d"){
                     doneTask(tasks);
                 }
+            else if(foo=="p"){
+                    printAllTasks(tasks);
+                }
             else if(foo=="a"){
               addTask(tasks);
                 }
@@ -86,8 +73,6 @@ int main(int argc, char** argv) {
             else if(foo=="e"){
                     editTask(tasks);
                 }
-                //BUG: displays 5 command prompts after this
-
             else if(foo=="k"){
                 Task tt;
                 int num;
@@ -159,6 +144,7 @@ int main(int argc, char** argv) {
     }
     else std::cout << "error" << std::endl ;
 }
+//query user for task to be edited, and edit the task
 void editTask(vector<Task> &tasks){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
@@ -219,6 +205,7 @@ void editTask(vector<Task> &tasks){
                     break;
                     }
                     }
+//search tasks for best match of name; edit the selected task
 void editTask(vector<Task> &tasks, string name){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
@@ -280,6 +267,7 @@ void editTask(vector<Task> &tasks, string name){
                     break;
                     }
                     }
+//queries user for task name and deletes task
 void doneTask(vector<Task> &tasks){
     int remove,perm;
     if(tasks.size()==0){
@@ -298,6 +286,7 @@ void doneTask(vector<Task> &tasks){
         tasks[remove-1].done=1;
     }
     }
+//searches tasks by name and deletes the task that matches name best
 void doneTask(vector<Task> &tasks, string name){
     int remove,perm;
     vector<string> query (15);
@@ -323,6 +312,7 @@ void doneTask(vector<Task> &tasks, string name){
     cout <<"This task has been marked done"<<endl;
     return;
 }
+//returns vector of strings of what field from tasks vector
 vector<string> getStrings(vector<Task> tasks){
     vector<string> names (tasks.size());
     for (int i =0;i<tasks.size();i++){
@@ -330,6 +320,7 @@ vector<string> getStrings(vector<Task> tasks){
     }
     return names;
     }
+//parses a string by spaces
 vector<string> parseQuery(string in){
     istringstream ss(in);
     string buff;
@@ -344,6 +335,8 @@ vector<string> parseQuery(string in){
   return out;
     }
     //record needs to be converted into 2d array, or searchString has to parse record
+// searches the query vector for the highest number of matches of strings in record.
+// returns index of string in query with the most matches
 int searchString(vector<string> query, vector<string> record){
     int score,rid=1,maxscore=0;
                 cout <<record.size()<<"test"<<endl;
@@ -365,6 +358,7 @@ int searchString(vector<string> query, vector<string> record){
             }
     return rid;
 }
+//print a vector of tasks that represent a schedule
 void printSched(vector<Task> todo, duration length){
 if(todo.size()==0){
 cout<<"No tasks found"<<endl;
@@ -390,6 +384,7 @@ return;
             }
         }
 }
+//print all tasks to console
 void printAllTasks(vector<Task> todo){
     cout <<endl<< "All your tasks: " << endl;
     for (unsigned int i =0;i<todo.size();i++){
@@ -403,6 +398,7 @@ void printAllTasks(vector<Task> todo){
             }
     }
 }
+//add a task with the title of @name to a tasks vector.
 int addTask(vector<Task>& tasks, string name){
     Task tt;
     string newval,newvaldesc;
@@ -439,6 +435,7 @@ int addTask(vector<Task>& tasks, string name){
      tasks.push_back(tt);
     return 1;
 }
+//add a task and query for the name in console
 int addTask(vector<Task>& tasks){
     Task tt;
     string newval,newvaldesc;
@@ -481,16 +478,19 @@ int addTask(vector<Task>& tasks){
      tasks.push_back(tt);
     return 1;
         }
+//sorts tasks based on utility
 vector<Task> sortTasks(vector<Task> vec){
 
     sort(vec.begin(), vec.end(), less_than_key());
     return vec;
 }
+//writes a single task to file
 void appendTask(Task& task,ofstream& outfile){
 
   outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<","<<task.due<<endl;
   return;
 }
+//saves tasks to file
 void saveTasks(vector<Task> tasks){
     vector<Task>::iterator it = tasks.begin();
     ofstream outfile("input.txt");
@@ -502,6 +502,7 @@ void saveTasks(vector<Task> tasks){
         }
     outfile.close();
 }
+//read tasks from file and return a vector<Task> containing them
 vector<Task> readTasks(){
     vector<Task> tasks;
     string scoreline, temp;

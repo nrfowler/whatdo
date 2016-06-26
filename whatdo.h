@@ -1,5 +1,6 @@
 #include <vector>
 using namespace std;
+
 class Task{
     public:
         string what; //present-tense description of action
@@ -40,4 +41,19 @@ duration length;
 int numTasks;
 int indoors;//schedules can be created for indoor tasks or outdoor tasks
 };
-
+vector<Task> readTasks();
+vector<Task> sortTasks(vector<Task> vec);
+void saveTasks(vector<Task> t);
+void appendTask(Task& task,ofstream& outfile);
+void printSched(vector<Task> vec, duration length);
+void rmEmptyLines();
+void printAllTasks(vector<Task> todo);
+int addTask(vector<Task>& tasks);
+void doneTask(vector<Task>& tasks);
+void editTask(vector<Task> &tasks);
+int addTask(vector<Task>& tasks,string name);
+void doneTask(vector<Task>& tasks,string name);
+void editTask(vector<Task> &tasks,string name);
+int searchString(vector<string> query, vector<string> record);
+vector<string> getStrings(vector<Task> tasks);
+vector<string> parseQuery(string in);
