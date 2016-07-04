@@ -11,7 +11,7 @@
 using namespace std;
 
 const int ROWS = 100;//max. # of tasks in input file
-const int COLS = 13;//number of task fields
+const int COLS = 14;//number of task fields
 const int BUFFSIZE = 900;//maximum size of a task line in input file
 //convert @mins to duration object; not currently in use
 duration mins2duration(int mins){
@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
                     if((it->min <= min) && (it->done!=1)) {
                         todo.push_back(*it);
                     min-=it->min;
+                    cout<<it->what<<endl;
                     }
                     it++;
                 }
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
 
 
             else if(foo=="e"){
-                    editTask(tasks);
+                    editTaskqueryName(tasks);
                 }
             else if(foo=="k"){
                 Task tt;
@@ -145,7 +146,7 @@ int main(int argc, char** argv) {
     else std::cout << "error" << std::endl ;
 }
 //query user for task to be edited, and edit the task
-void editTask(vector<Task> &tasks){
+void editTaskqueryName(vector<Task> &tasks){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
                            return;
@@ -156,6 +157,12 @@ void editTask(vector<Task> &tasks){
                 printAllTasks(tasks);
                 cout<< "Which task would you like to edit?" <<endl;
                 cin >> num;
+                editTaskByID(num,tasks);
+                return;
+}
+void editTaskByID(int num, vector<Task> &tasks){
+                string newval;
+                int field;
                 cout<< "Which field would you like to edit?" <<endl;
                 cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
                 cin>>field;
@@ -217,55 +224,8 @@ void editTask(vector<Task> &tasks, string name){
                 //search for task name
                 vector<string> query=parseQuery(name);
                 vector<string> taskstrings=getStrings(tasks);
-                num=searchString(query,taskstrings);
-                cout<< "Which field would you like to edit?" <<endl;
-                cout<<"n. Name of task \n 2. Description \n u. Utility \n m. Minutes duration \n i. Indoors? \n 6. Sedentary \n 7. Sleep friendly \n 8. Domain \n 9. Indefinite \n 10. Done \n 11. Repeat \n 12. Effort"<<endl;
-                cin>>field;
-                cout<<"Enter the new value"<<endl;
-                cin.ignore();
-                getline (cin,newval);
-                char *cstr = new char[newval.length() + 1];
-                strcpy(cstr, newval.c_str());
-                switch (field){
-                case 1:
-                    tasks[num-1].what=newval;
-                    break;
-                case 2:
-                    tasks[num-1].desc=newval;
-                    break;
-                case 3:
-                    tasks[num-1].utils=atoi(cstr);
-                    break;
-                case 4:
-                    tasks[num-1].min=atoi(cstr);
-                    break;
-                 case 5:
-                    tasks[num-1].indoors=atoi(cstr);
-                    break;
-                case 6:
-                    tasks[num-1].sedentary=atoi(cstr);
-                    break;
-                case 7:
-                    tasks[num-1].sleepfriendly=atoi(cstr);
-                    break;
-                case 8:
-                    tasks[num-1].domain=newval;
-                    break;
-                case 9:
-                    tasks[num-1].indefinite=atoi(cstr);
-                    break;
-                case 10:
-                    tasks[num-1].done=atoi(cstr);
-                    break;
-                case 11:
-                    tasks[num-1].repeat=atoi(cstr);
-                    break;
-                case 12:
-                    tasks[num-1].effort=atoi(cstr);
-                    break;
-                default:
-                    break;
-                    }
+                editTaskByID(searchString(query,taskstrings),tasks);
+                return;
                     }
 //queries user for task name and deletes task
 void doneTask(vector<Task> &tasks){
@@ -283,7 +243,7 @@ void doneTask(vector<Task> &tasks){
         tasks.erase(tasks.begin()+remove-1);
     }
     else {
-        tasks[remove-1].done=1;
+        tasks[remove-1].done=~tasks[remove-1].done;
     }
     }
 //searches tasks by name and deletes the task that matches name best
@@ -388,7 +348,7 @@ return;
 void printAllTasks(vector<Task> todo){
     cout <<endl<< "All your tasks: " << endl;
     for (unsigned int i =0;i<todo.size();i++){
-        cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes";
+        cout <<(i+1)<<". "<< todo[i].what << " for " << todo[i].min <<" minutes "<<todo[i].utilpermin;
         if(todo[i].done==1){
             cout<<" DONE"<<endl;
         }
@@ -482,12 +442,15 @@ int addTask(vector<Task>& tasks){
 vector<Task> sortTasks(vector<Task> vec){
 
     sort(vec.begin(), vec.end(), less_than_key());
+        printAllTasks(vec);
+
     return vec;
 }
 //writes a single task to file
 void appendTask(Task& task,ofstream& outfile){
 
-  outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<","<<task.due<<endl;
+  outfile <<task.what<<","<<task.desc<<","<<task.utils<<","<<task.min<<","<<task.utilpermin<<","<<task.indoors<<","<<task.sedentary<<","<<task.sleepfriendly<<","<<task.domain<<","<<task.indefinite<<","<<task.done<<","<<task.repeat<<","<<task.effort<<","<<task.due<<endl;
+
   return;
 }
 //saves tasks to file
@@ -507,9 +470,11 @@ vector<Task> readTasks(){
     vector<Task> tasks;
     string scoreline, temp;
     Task temptask;
+    temptask.what="test";
     temptask.desc="0";
     temptask.utils=1;
     temptask.min=30;
+    temptask.utilpermin=.001;
     temptask.indoors=1;
     temptask.sedentary=1;
     temptask.sleepfriendly=1;
@@ -538,22 +503,32 @@ vector<Task> readTasks(){
       else if(col==3)
       {temptask.min=atoi(buff);}
       else if(col==4)
-      {temptask.indoors=atoi(buff);}
+      {
+          if(temptask.min!=0){
+          temptask.utilpermin=(float)temptask.utils/(float)temptask.min;
+          }
+          else{
+            temptask.utilpermin=.001;
+          }
+      }
+      //cout<<temptask.utilpermin;}
       else if(col==5)
-      {temptask.sedentary=atoi(buff);}
+      {temptask.indoors=atoi(buff);}
       else if(col==6)
-      {temptask.sleepfriendly=atoi(buff);}
+      {temptask.sedentary=atoi(buff);}
       else if(col==7)
-      {temptask.domain=buff;}
+      {temptask.sleepfriendly=atoi(buff);}
       else if(col==8)
-      {temptask.indefinite=atoi(buff);}
+      {temptask.domain=buff;}
       else if(col==9)
-      {temptask.done=atoi(buff);}
+      {temptask.indefinite=atoi(buff);}
       else if(col==10)
-      {temptask.repeat=atoi(buff);}
+      {temptask.done=atoi(buff);}
       else if(col==11)
-      {temptask.effort=atoi(buff);}
+      {temptask.repeat=atoi(buff);}
       else if(col==12)
+      {temptask.effort=atoi(buff);}
+      else if(col==13)
       {temptask.due=buff;}
 	  ++col;
 	}
@@ -565,9 +540,12 @@ vector<Task> readTasks(){
 
 	ss.clear();
 	++row;
+	//printAllTasks(tasks);
   }
 
-
+    if(tasks.size()==0){
+        tasks.push_back(temptask);
+    }
   infile.close();
 
 

@@ -7,6 +7,7 @@ class Task{
         string desc; //more detailed description of action
         int utils; // value which determines priority of task. Higher is more important.
         int min; //minutes duration of task.
+        float utilpermin; //utility divided by min. Used to calculate schedule.
         bool indoors; // 1 = indoors. Any timespan longer than 4 hours will require an outside task.
         bool sedentary; //1 means any sedentary activity. Too many hours of sedentary tasks will cause a non sedentary task to be added
         bool sleepfriendly; //1 means activity will not disrupt sleep if done 1-2 hours before sleep (reading, eating, etc)
@@ -25,7 +26,7 @@ class Task{
         public:
         inline bool operator() (const Task &struct1, const Task &struct2)
         {
-            return (struct1.utils > struct2.utils);
+            return (struct1.utilpermin > struct2.utilpermin);
         }
     };
  class duration{
@@ -50,10 +51,12 @@ void rmEmptyLines();
 void printAllTasks(vector<Task> todo);
 int addTask(vector<Task>& tasks);
 void doneTask(vector<Task>& tasks);
-void editTask(vector<Task> &tasks);
+void editTaskqueryName(vector<Task> &tasks);
+void editTaskByID(int num, vector<Task> &tasks);
 int addTask(vector<Task>& tasks,string name);
 void doneTask(vector<Task>& tasks,string name);
 void editTask(vector<Task> &tasks,string name);
 int searchString(vector<string> query, vector<string> record);
 vector<string> getStrings(vector<Task> tasks);
 vector<string> parseQuery(string in);
+float UtilPerMin(int util,int minutes);
