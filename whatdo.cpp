@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 
 
             else if(foo=="e"){
-                    editTaskqueryName(tasks);
+                    editTaskQueryName(tasks);
                 }
             else if(foo=="k"){
                 Task tt;
@@ -115,10 +115,7 @@ int main(int argc, char** argv) {
         string args;
         for (int i =2;i<argc;i++){
             args+=string(argv[i])+" ";
-        //std::cout << args<<" "<<argv[i]<<" "<<" " << std::endl ;//delete
             }
-        //char * argschr = new char[args.length() + 1];
-        //strcpy(argschr, args.c_str());
         if(argv[1][1]=='-'){
             if(strcmp(argv[1],"--add")==0){
                 addTask(tasks,args);
@@ -146,7 +143,7 @@ int main(int argc, char** argv) {
     else std::cout << "error" << std::endl ;
 }
 //query user for task to be edited, and edit the task
-void editTaskqueryName(vector<Task> &tasks){
+void editTaskQueryName(vector<Task> &tasks){
     if(tasks.size()==0){
                         cout<<"No tasks found"<<endl;
                            return;
@@ -184,28 +181,31 @@ void editTaskByID(int num, vector<Task> &tasks){
                 case 4:
                     tasks[num-1].min=atoi(cstr);
                     break;
-                 case 5:
+                case 5:
+                    tasks[num-1].utilpermin=atof(cstr);
+                    break;
+                 case 6:
                     tasks[num-1].indoors=atoi(cstr);
                     break;
-                case 6:
+                case 7:
                     tasks[num-1].sedentary=atoi(cstr);
                     break;
-                case 7:
+                case 8:
                     tasks[num-1].sleepfriendly=atoi(cstr);
                     break;
-                case 8:
+                case 9:
                     tasks[num-1].domain=newval;
                     break;
-                case 9:
+                case 10:
                     tasks[num-1].indefinite=atoi(cstr);
                     break;
-                case 10:
+                case 11:
                     tasks[num-1].done=atoi(cstr);
                     break;
-                case 11:
+                case 12:
                     tasks[num-1].repeat=atoi(cstr);
                     break;
-                case 12:
+                case 13:
                     tasks[num-1].effort=atoi(cstr);
                     break;
                 default:
@@ -299,13 +299,9 @@ vector<string> parseQuery(string in){
 // returns index of string in query with the most matches
 int searchString(vector<string> query, vector<string> record){
     int score,rid=1,maxscore=0;
-                cout <<record.size()<<"test"<<endl;
-
     for (int i =0;i<record.size();i++){
             score =0;
         for (int j =0;j<query.size();j++){
-            cout <<query[j]<<" "<<record[i]<<" "<<endl;
-
             if(query[j].compare(record[i])==0){
                 score+=3;
             }
@@ -511,7 +507,6 @@ vector<Task> readTasks(){
             temptask.utilpermin=.001;
           }
       }
-      //cout<<temptask.utilpermin;}
       else if(col==5)
       {temptask.indoors=atoi(buff);}
       else if(col==6)
@@ -540,7 +535,6 @@ vector<Task> readTasks(){
 
 	ss.clear();
 	++row;
-	//printAllTasks(tasks);
   }
 
     if(tasks.size()==0){
