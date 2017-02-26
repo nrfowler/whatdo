@@ -1,4 +1,4 @@
-input.txt
+
 *.exe
 *.o
 whatdo.exe.stackdump
@@ -10,3 +10,8 @@ bin/*
 obj/*
 *.depend
 *.layout
+
+# Vagrant files
+
+Vagrantfile
+.vagrant/**
